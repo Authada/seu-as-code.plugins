@@ -149,33 +149,33 @@ tasks.coveralls {
     onlyIf { isCI }
 }
 
-distributions {
-    main {
-    }
-    release {
-        baseName = 'seuac-plugins'
-        contents {
-            from('seuac-base-plugin/build/libs') {
-                include '*.jar'
-            }
-            from('seuac-credentials-plugin/build/libs') {
-                include '*.jar'
-            }
-            from('seuac-git-plugin/build/libs') {
-                include '*.jar'
-            }
-            from('seuac-svn-plugin/build/libs') {
-                include '*.jar'
-            }
-            from('seuac-platform-plugin/build/libs') {
-                include '*.jar'
-            }
-            from('seuac-homebrew-plugin/build/libs') {
-                include '*.jar'
-            }
-            from('seuac-chocolatey-plugin/build/libs') {
-                include '*.jar'
-            }
-        }
-    }
-}
+//distributions {
+//    main {
+//    }
+//    release {
+//        baseName = 'seuac-plugins'
+//        contents {
+//            from('seuac-base-plugin/build/libs') {
+//                include '*.jar'
+//            }
+//            from('seuac-credentials-plugin/build/libs') {
+//                include '*.jar'
+//            }
+//            from('seuac-git-plugin/build/libs') {
+//                include '*.jar'
+//            }
+//            from('seuac-svn-plugin/build/libs') {
+//                include '*.jar'
+//            }
+//            from('seuac-platform-plugin/build/libs') {
+//                include '*.jar'
+//            }
+//            from('seuac-homebrew-plugin/build/libs') {
+//                include '*.jar'
+//            }
+//            from('seuac-chocolatey-plugin/build/libs') {
+//                include '*.jar'
+//            }
+//        }
+//    }
+//}
