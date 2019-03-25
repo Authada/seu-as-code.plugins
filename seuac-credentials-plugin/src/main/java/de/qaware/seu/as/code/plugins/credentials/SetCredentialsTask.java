@@ -41,7 +41,10 @@ public class SetCredentialsTask extends AbstractCredentialsTask {
      */
     @TaskAction
     public void onAction() {
-        getConsole().format("%n");
-        getStorage().setCredentials(getService(), getUsername(), getPassword());
+        try (final SystemConsole console = new SystemConsole()) {
+            setConsole(console);
+            getConsole().format("%n");
+            getStorage().setCredentials(getService(), getUsername(), getPassword());
+        }
     }
 }

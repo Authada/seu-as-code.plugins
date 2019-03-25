@@ -26,9 +26,9 @@ import org.gradle.api.Project;
  * @author phxql
  */
 public class SeuacCredentialsPlugin implements Plugin<Project> {
+
     @Override
     public void apply(Project project) {
-        SystemConsole console = new SystemConsole();
         CredentialsStorageFactory factory = new CredentialsStorageFactory.Default(project);
 
         // register the credentials configuration with the project
@@ -38,18 +38,20 @@ public class SeuacCredentialsPlugin implements Plugin<Project> {
         CredentialsProperty property = new CredentialsProperty(factory);
         project.getExtensions().getExtraProperties().set(CredentialsProperty.NAME, property);
 
-        SetCredentialsTask setCredentialsTask = project.getTasks().create("setCredentials", SetCredentialsTask.class);
-        initTask(setCredentialsTask, console, factory);
+        SetCredentialsTask setCredentialsTask =
+                project.getTasks().create("setCredentials", SetCredentialsTask.class);
+        initTask(setCredentialsTask, factory);
 
-        ClearCredentialsTask clearCredentialsTask = project.getTasks().create("clearCredentials", ClearCredentialsTask.class);
-        initTask(clearCredentialsTask, console, factory);
+        ClearCredentialsTask clearCredentialsTask =
+                project.getTasks().create("clearCredentials", ClearCredentialsTask.class);
+        initTask(clearCredentialsTask, factory);
 
-        DisplayCredentialsTask displayCredentialsTask = project.getTasks().create("displayCredentials", DisplayCredentialsTask.class);
-        initTask(displayCredentialsTask, console, factory);
+        DisplayCredentialsTask displayCredentialsTask =
+                project.getTasks().create("displayCredentials", DisplayCredentialsTask.class);
+        initTask(displayCredentialsTask, factory);
     }
 
-    private void initTask(AbstractCredentialsTask task, SystemConsole console, CredentialsStorageFactory factory) {
-        task.setConsole(console);
+    private void initTask(AbstractCredentialsTask task, CredentialsStorageFactory factory) {
         task.setStorageFactory(factory);
     }
 }

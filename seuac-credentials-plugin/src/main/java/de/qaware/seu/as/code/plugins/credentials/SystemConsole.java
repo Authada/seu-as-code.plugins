@@ -20,10 +20,24 @@ import java.io.Console;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
+
 /**
  * Supports I/O opperations.
  */
-public class SystemConsole {
+public class SystemConsole implements AutoCloseable {
+
+    private final static Logger LOG = Logging.getLogger(SystemConsole.class);
+
+    private final Console console = System.console();
+    private BufferedReader br;
+
+    SystemConsole() {
+        if (console == null) {
+            br = new BufferedReader(new InputStreamReader(System.in));
+        }
+    }
 
     /**
      * Reads a line from the console.
@@ -33,12 +47,11 @@ public class SystemConsole {
      * @return the line read from the console
      */
     public String readLine(String prompt, Object... args) {
-        Console console = System.console();
         if (console != null) {
             return console.readLine(prompt, args);
         } else {
-            System.out.format(prompt, args);
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
+            LOG.lifecycle(String.format(prompt, args));
+            try {
                 return br.readLine();
             } catch (IOException e) {
                 throw new CredentialsException("Unable to read line from System.in", e);
@@ -57,8 +70,8 @@ public class SystemConsole {
         if (console != null) {
             return console.readPassword(prompt);
         } else {
-            System.out.format(prompt);
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
+            LOG.lifecycle(String.format(prompt));
+            try {
                 return br.readLine().toCharArray();
             } catch (IOException e) {
                 throw new CredentialsException("Unable to read password from System.in", e);
@@ -78,7 +91,11 @@ public class SystemConsole {
         if (console != null) {
             console.format(fmt, args);
         } else {
-            System.out.format(fmt, args);
+            LOG.lifecycle(String.format(fmt, args));
         }
+    }
+
+    @Override
+    public void close() {
     }
 }

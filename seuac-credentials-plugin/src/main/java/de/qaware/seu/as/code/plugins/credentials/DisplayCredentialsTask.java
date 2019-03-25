@@ -39,13 +39,16 @@ public class DisplayCredentialsTask extends AbstractCredentialsTask {
      */
     @TaskAction
     public void onAction() {
-        String service = getService();
-        Credentials credentials = getStorage().findCredentials(service);
-        if (credentials != null) {
-            getConsole().format("%nCurrent credentials for service '%s' -> {'%s', '%s'}.%n", service,
-                    credentials.getUsername(), credentials.getPassword());
-        } else {
-            getConsole().format("%nNo credentials found for service '%s'.%n", service);
+        try (final SystemConsole console = new SystemConsole()) {
+            setConsole(console);
+            String service = getService();
+            Credentials credentials = getStorage().findCredentials(service);
+            if (credentials != null) {
+                getConsole().format("%nCurrent credentials for service '%s' -> {'%s', '%s'}.%n", service,
+                        credentials.getUsername(), credentials.getPassword());
+            } else {
+                getConsole().format("%nNo credentials found for service '%s'.%n", service);
+            }
         }
     }
 }

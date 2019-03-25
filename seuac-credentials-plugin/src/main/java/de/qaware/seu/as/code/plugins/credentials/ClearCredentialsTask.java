@@ -41,12 +41,15 @@ public class ClearCredentialsTask extends AbstractCredentialsTask {
      */
     @TaskAction
     public void onAction() {
-        String service = getService();
-        if (StringUtils.isNotBlank(service)) {
-            getConsole().format("%n");
-            String answer = getConsole().readLine("Clear credentials for service %s (y/N)?", service);
-            if (StringUtils.equalsIgnoreCase(answer, "y")) {
-                getStorage().clearCredentials(service);
+        try (final SystemConsole console = new SystemConsole()) {
+            setConsole(console);
+            String service = getService();
+            if (StringUtils.isNotBlank(service)) {
+                getConsole().format("%n");
+                String answer = getConsole().readLine("Clear credentials for service %s (y/N)?", service);
+                if (StringUtils.equalsIgnoreCase(answer, "y")) {
+                    getStorage().clearCredentials(service);
+                }
             }
         }
     }

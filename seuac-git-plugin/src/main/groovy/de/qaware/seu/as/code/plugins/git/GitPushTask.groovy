@@ -18,7 +18,7 @@ package de.qaware.seu.as.code.plugins.git
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.PushCommand
 import org.eclipse.jgit.lib.Constants
-import org.gradle.api.internal.tasks.options.Option
+import org.gradle.api.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
 
 /**

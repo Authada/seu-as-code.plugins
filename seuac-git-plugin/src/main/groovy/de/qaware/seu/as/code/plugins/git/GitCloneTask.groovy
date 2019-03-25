@@ -18,7 +18,7 @@ package de.qaware.seu.as.code.plugins.git
 import org.eclipse.jgit.api.CloneCommand
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.lib.Repository
-import org.gradle.api.internal.tasks.options.Option
+import org.gradle.api.tasks.options.Option
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 

@@ -14,6 +14,9 @@
  *    limitations under the License.
  */
 
+plugins {
+    id 'java-gradle-plugin'
+}
 dependencies {
     compile 'net.java.dev.jna:jna:4.2.0'
     compile 'net.java.dev.jna:jna-platform:4.2.0'
@@ -23,8 +26,18 @@ dependencies {
     compile 'commons-io:commons-io:2.4'
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_7
-targetCompatibility = JavaVersion.VERSION_1_7
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+idea {
+    module {
+        inheritOutputDirs = false
+        outputDir = file("$buildDir/classes/java/main")
+        testOutputDir = file("$buildDir/classes/java/test")
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
 
 task copyTestResources(type: Copy) {
     from "${projectDir}/src/test/resources"
@@ -158,17 +171,13 @@ bintray {
     }
 }
 
-pluginBundle {
-    website = project.websiteUrl
-    vcsUrl = project.scmUrl
-
+gradlePlugin {
     plugins {
         credentialsPlugin {
             id = 'de.qaware.seu.as.code.credentials'
             displayName = project.displayName
             description = project.description
-            tags = ['credentials', 'security', 'seu-as-code']
-            version = project.version
+            implementationClass = 'de.qaware.seu.as.code.plugins.credentials.SeuacCredentialsPlugin'
         }
     }
 }
