@@ -1,3 +1,5 @@
+rootProject.name = "seu-as-code.plugins"
+
 //include 'seuac-base-plugin'
 include 'seuac-credentials-plugin'
 //include 'seuac-git-plugin'

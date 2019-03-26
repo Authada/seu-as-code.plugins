@@ -15,10 +15,12 @@
  */
 package de.qaware.seu.as.code.plugins.credentials;
 
+import org.gradle.api.Project;
+import org.gradle.api.initialization.Settings;
+
 import de.qaware.seu.as.code.plugins.credentials.linux.SecretServiceAPICredentialsStorage;
 import de.qaware.seu.as.code.plugins.credentials.mac.KeychainCredentialsStorage;
 import de.qaware.seu.as.code.plugins.credentials.win.PropertyCredentialsStorage;
-import org.gradle.api.Project;
 
 /**
  * A factory method implementation to create {@link CredentialsStorage} instances.
@@ -26,6 +28,7 @@ import org.gradle.api.Project;
  * @author lreimer
  */
 interface CredentialsStorageFactory {
+
     /**
      * Create a configured CredentialsStorage instance for the given project.
      *
@@ -63,6 +66,36 @@ interface CredentialsStorageFactory {
                 storage = new SecretServiceAPICredentialsStorage();
             } else {
                 project.getLogger().warn("Unsupported OS. All credential tasks will be disabled.");
+                storage = new CredentialsStorage.None();
+            }
+            return storage;
+        }
+    }
+
+    /**
+     * The default storage implementation.
+     */
+    class SettingsCredentialsStorageFactory implements CredentialsStorageFactory {
+
+        private final Settings settings;
+
+        SettingsCredentialsStorageFactory(Settings settings) {
+            this.settings = settings;
+        }
+
+        @Override
+        public CredentialsStorage create() {
+            CredentialsExtension extension = settings.getExtensions().getByType(CredentialsExtension.class);
+
+            CredentialsStorage storage;
+            if (OperatingSystem.isWindows()) {
+                storage = new PropertyCredentialsStorage(settings, extension);
+            } else if (OperatingSystem.isMacOs()) {
+                storage = new KeychainCredentialsStorage(extension);
+            } else if (OperatingSystem.isLinux()) {
+                storage = new SecretServiceAPICredentialsStorage();
+            } else {
+                System.out.println("Unsupported OS. All credential tasks will be disabled.");
                 storage = new CredentialsStorage.None();
             }
             return storage;
