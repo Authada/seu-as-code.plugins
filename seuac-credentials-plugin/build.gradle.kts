@@ -1,3 +1,5 @@
+import org.gradle.api.JavaVersion.VERSION_1_8
+
 /*
  *    Copyright (C) 2015 QAware GmbH
  *
@@ -14,126 +16,99 @@
  *    limitations under the License.
  */
 
-//plugins {
-//    id 'java-gradle-plugin'
-//}
-//dependencies {
-//    compile 'net.java.dev.jna:jna:4.2.0'
-//    compile 'net.java.dev.jna:jna-platform:4.2.0'
-//
-//    compile 'org.apache.commons:commons-lang3:3.4'
-//    compile 'commons-codec:commons-codec:1.10'
-//    compile 'commons-io:commons-io:2.4'
-//}
-//
-//sourceCompatibility = JavaVersion.VERSION_1_8
-//targetCompatibility = JavaVersion.VERSION_1_8
-//
-//idea {
-//    module {
-//        inheritOutputDirs = false
-//        outputDir = file("$buildDir/classes/java/main")
-//        testOutputDir = file("$buildDir/classes/java/test")
-//        downloadJavadoc = true
-//        downloadSources = true
-//    }
-//}
-//
-//task copyTestResources(type: Copy) {
-//    from "${projectDir}/src/test/resources"
-//    into "${buildDir}/classes/test"
-//}
-//processTestResources.dependsOn copyTestResources
-//
-//task javadocJar(type: Jar, dependsOn: javadoc) {
-//    classifier = 'javadoc'
-//    from javadoc.destinationDir
-//}
-//
-//artifacts {
-//    archives sourcesJar
-//    archives javadocJar
-//}
-//
-//def pomConfig = {
-//
-//    inceptionYear '2015'
-//
-//    scm {
-//        connection "scm:git:${project.scmUrl}"
-//        developerConnection "scm:git:${project.scmUrl}"
-//        url project.websiteUrl
-//    }
-//
-//    issueManagement {
-//        system 'GitHub'
-//        url project.issueTrackerUrl
-//    }
-//
-//    licenses {
-//        license([:]) {
-//            name 'The Apache Software License, Version 2.0'
-//            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-//            distribution 'repo'
-//        }
-//    }
-//
-//    organisation {
-//        name 'QAware GmbH'
-//        url 'https://www.qaware.de'
-//    }
-//
-//    developers {
-//        developer {
-//            id 'lreimer'
-//            name 'Mario-Leander Reimer'
-//            email 'mario-leander.reimer@qaware.de'
-//            organization 'QAware GmbH'
-//            organizationUrl 'https://www.qaware.de'
-//            roles { role 'Developer' }
-//        }
-//        developer {
-//            id 'phxql'
-//            name 'Moritz Kammerer'
-//            email 'moritz.kammerer@qaware.de'
-//            organization 'QAware GmbH'
-//            organizationUrl 'https://www.qaware.de'
-//            roles { role 'Developer' }
-//        }
-//        developer {
-//            id 'clboettcher'
-//            name 'Claudius Boettcher'
-//            email 'claudius.boettcher@qaware.de'
-//            organization 'QAware GmbH'
-//            organizationUrl 'https://www.qaware.de'
-//            roles { role 'Developer' }
-//        }
-//    }
-//}
-//
-//publishing {
-//    repositories {
-//        // set the properties via -P to publish to your company repo
-//        maven {
-//            url = project.hasProperty('nexusUrl') ? project.nexusUrl : ''
-//            authentication {
-//                basic(BasicAuthentication)
-//            }
-//            credentials {
-//                username = project.hasProperty('nexusUsername') ? project.nexusUsername : ''
-//                password = project.hasProperty('nexusPassword') ? project.nexusPassword : ''
-//            }
-//        }
-//    }
-//}
-//
-//gradlePlugin {
-//    plugins {
-//        credentialsPlugin {
-//            id = 'de.qaware.seu.as.code.credentials'
-//            displayName = project.displayName
-//            description = project.description
-//            implementationClass = 'de.qaware.seu.as.code.plugins.credentials.SeuacCredentialsPlugin'
-//        }
-//    }
-//}
+plugins {
+    groovy
+    java
+    `java-gradle-plugin`
+    `maven-publish`
+}
+
+java {
+    sourceCompatibility = VERSION_1_8
+    targetCompatibility = VERSION_1_8
+}
+
+val jnaVersion = "5.6.0"
+dependencies {
+    implementation(gradleApi())
+
+    implementation("net.java.dev.jna:jna:$jnaVersion")
+    implementation("net.java.dev.jna:jna-platform:$jnaVersion")
+    implementation("org.apache.commons:commons-lang3:3.11")
+    implementation("commons-codec:commons-codec:1.15")
+    implementation("commons-io:commons-io:2.8.0")
+
+    testImplementation(localGroovy())
+    testImplementation(gradleTestKit())
+
+    testImplementation("org.spockframework:spock-core:1.3-groovy-2.5")
+    testImplementation("org.hamcrest:hamcrest-library:2.2")
+    testRuntimeOnly("cglib:cglib-nodep:3.3.0")
+
+//        testRuntime 'org.objenesis:objenesis:2.1'
+//        testCompile 'com.athaydes:spock-reports:1.2.5'
+}
+
+tasks {
+
+    val sourceJarTask = register("sourceJar", Jar::class) {
+        archiveClassifier.set("sources")
+        project.the<SourceSetContainer>().findByName("main")?.run {
+            from(allSource)
+        }
+    }
+    withType(GenerateMavenPom::class.java) {
+        mustRunAfter(sourceJarTask)
+    }
+
+    val copyTestResourcesTasks = register<Copy>("copyTestResources") {
+        from(layout.projectDirectory.dir("src/test/resources"))
+        into(layout.buildDirectory.dir("classes/test"))
+    }
+    named("processTestResources").configure {
+        dependsOn(copyTestResourcesTasks)
+    }
+}
+
+idea {
+    module {
+        inheritOutputDirs = false
+        outputDir = file("$buildDir/classes/java/main")
+        testOutputDir = file("$buildDir/classes/java/test")
+        isDownloadJavadoc = true
+        isDownloadSources = true
+    }
+}
+
+
+val nexusUrl: String by project
+// set the properties via -P to publish to your company repo
+val nexusUsername: String by project
+val nexusPassword: String by project
+publishing {
+    repositories {
+        maven {
+            url = uri(nexusUrl)
+            authentication {
+                create<BasicAuthentication>("basic")
+            }
+            credentials {
+                username = nexusUsername
+                password = nexusPassword
+            }
+        }
+    }
+}
+
+val displayNameValue: String by project
+val descriptionValue: String by project
+gradlePlugin {
+    plugins {
+        register("credentialsPlugin") {
+            id = "de.qaware.seu.as.code.credentials"
+            displayName = displayNameValue
+            description = descriptionValue
+            implementationClass = "de.qaware.seu.as.code.plugins.credentials.SeuacCredentialsPlugin"
+        }
+    }
+}
