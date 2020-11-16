@@ -15,17 +15,18 @@
  */
 package de.qaware.seu.as.code.plugins.credentials.mac;
 
-import com.sun.jna.Native;
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.IntByReference;
-import com.sun.jna.ptr.PointerByReference;
+import static com.sun.jna.Native.load;
+
+import org.apache.commons.codec.binary.Base64;
+
 import de.qaware.seu.as.code.plugins.credentials.Credentials;
 import de.qaware.seu.as.code.plugins.credentials.CredentialsException;
 import de.qaware.seu.as.code.plugins.credentials.CredentialsExtension;
 import de.qaware.seu.as.code.plugins.credentials.CredentialsStorage;
-import org.apache.commons.codec.binary.Base64;
-
-import static com.sun.jna.Native.loadLibrary;
+import com.sun.jna.Native;
+import com.sun.jna.Pointer;
+import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.PointerByReference;
 
 /**
  * The platform specific implementation that uses the MacSO keychain mechanism.
@@ -53,8 +54,8 @@ public class KeychainCredentialsStorage implements CredentialsStorage {
      */
     public KeychainCredentialsStorage(CredentialsExtension extension) {
         this.keychainFile = extension.getKeychainFile();
-        this.security = (Security) loadLibrary("Security", Security.class);
-        this.coreFoundation = (CoreFoundation) loadLibrary("CoreFoundation", CoreFoundation.class);
+        this.security = load("Security", Security.class);
+        this.coreFoundation = load("CoreFoundation", CoreFoundation.class);
     }
 
     /**
