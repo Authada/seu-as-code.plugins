@@ -16,7 +16,7 @@
 package de.qaware.seu.as.code.plugins.credentials;
 
 import org.gradle.api.Plugin;
-import org.gradle.api.Project;
+import org.gradle.api.initialization.Settings;
 
 /**
  * SEU-as-code Credentials plugin.
@@ -25,33 +25,18 @@ import org.gradle.api.Project;
  *
  * @author phxql
  */
-public class SeuacCredentialsPlugin implements Plugin<Project> {
+public class SeuacCredentialsSettingsPlugin implements Plugin<Settings> {
 
     @Override
-    public void apply(Project project) {
-        CredentialsStorageFactory factory = new CredentialsStorageFactory.Default(project);
+    public void apply(final Settings settings) {
+        CredentialsStorageFactory factory = new CredentialsStorageFactory.SettingsCredentialsStorageFactory(settings);
 
         // register the credentials configuration with the project
         CredentialsExtension extension = new CredentialsExtension();
-        project.getExtensions().add(CredentialsExtension.NAME, extension);
+        settings.getExtensions().add(CredentialsExtension.NAME, extension);
 
         CredentialsProperty property = new CredentialsProperty(factory);
-        project.getExtensions().getExtraProperties().set(CredentialsProperty.NAME, property);
-
-        SetCredentialsTask setCredentialsTask =
-                project.getTasks().create("setCredentials", SetCredentialsTask.class);
-        initTask(setCredentialsTask, factory);
-
-        ClearCredentialsTask clearCredentialsTask =
-                project.getTasks().create("clearCredentials", ClearCredentialsTask.class);
-        initTask(clearCredentialsTask, factory);
-
-        DisplayCredentialsTask displayCredentialsTask =
-                project.getTasks().create("displayCredentials", DisplayCredentialsTask.class);
-        initTask(displayCredentialsTask, factory);
+        settings.getExtensions().getExtraProperties().set(CredentialsProperty.NAME, property);
     }
 
-    private void initTask(AbstractCredentialsTask task, CredentialsStorageFactory factory) {
-        task.setStorageFactory(factory);
-    }
 }

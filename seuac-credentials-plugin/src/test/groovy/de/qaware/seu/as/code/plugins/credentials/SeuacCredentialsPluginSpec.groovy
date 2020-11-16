@@ -15,8 +15,10 @@
  */
 package de.qaware.seu.as.code.plugins.credentials
 
-import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
+import org.junit.Ignore
+import org.junit.Rule
+import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 import static org.hamcrest.Matchers.notNullValue
@@ -27,17 +29,32 @@ import static spock.util.matcher.HamcrestSupport.expect
  *
  * @author lreimer
  */
+@Ignore
 class SeuacCredentialsPluginSpec extends Specification {
 
-    private Project project
+    @Rule
+    public final TemporaryFolder testProjectDir = new TemporaryFolder()
+    private File settingsFile
+    private File buildFile
 
     def setup() {
-        this.project = ProjectBuilder.builder().build()
+        settingsFile = testProjectDir.newFile("settings.gradle")
+        buildFile = testProjectDir.newFile("build.gradle")
     }
 
     def "Apply the plugin"() {
+        given:
+        settingsFile << "rootProject.name = 'apply-test'"
+        buildFile << """
+            plugins {
+                id 'de.qaware.seu.as.code.credentials'
+            }
+        """
+
         when: "the plugin is applied"
-        project.apply plugin: 'seuac-credentials'
+        def project = ProjectBuilder.builder()
+                .withProjectDir(testProjectDir.root)
+                .build()
 
         then: "we expect to find the tasks and the extension to be configured"
         SetCredentialsTask setCredentialsTask = (SetCredentialsTask) project.tasks.findByName('setCredentials')
@@ -60,4 +77,5 @@ class SeuacCredentialsPluginSpec extends Specification {
 
         expect extension, notNullValue()
     }
+
 }

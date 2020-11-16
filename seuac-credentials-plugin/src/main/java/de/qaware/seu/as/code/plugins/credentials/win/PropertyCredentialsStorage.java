@@ -15,16 +15,23 @@
  */
 package de.qaware.seu.as.code.plugins.credentials.win;
 
-import de.qaware.seu.as.code.plugins.credentials.*;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.FileUtils;
-import org.gradle.api.Project;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
+import org.gradle.api.Project;
+import org.gradle.api.initialization.Settings;
+import org.gradle.api.invocation.Gradle;
+
+import de.qaware.seu.as.code.plugins.credentials.Credentials;
+import de.qaware.seu.as.code.plugins.credentials.CredentialsException;
+import de.qaware.seu.as.code.plugins.credentials.CredentialsExtension;
+import de.qaware.seu.as.code.plugins.credentials.CredentialsStorage;
+import de.qaware.seu.as.code.plugins.credentials.Encryptor;
 
 /**
  * Stores the credentials in a property file.
@@ -46,18 +53,22 @@ public class PropertyCredentialsStorage implements CredentialsStorage {
      * @param extension the credentials configuration extension
      */
     public PropertyCredentialsStorage(Project project, CredentialsExtension extension) {
-        this(project, extension, new DPAPIEncryptor());
+        this(project.getGradle(), extension, new DPAPIEncryptor());
+    }
+
+    public PropertyCredentialsStorage(Settings settings, CredentialsExtension extension) {
+        this(settings.getGradle(), extension, new DPAPIEncryptor());
     }
 
     /**
      * Creates a new instance for the given Gradle project, credentials extension and encryptor.
      *
-     * @param project   a Gradle project
+     * @param gradle    a Gradle root object
      * @param extension the credentials configuration extension
      * @param encryptor an encryptor
      */
-    PropertyCredentialsStorage(Project project, CredentialsExtension extension, Encryptor encryptor) {
-        this(credentialsFile(project, extension), encryptor);
+    PropertyCredentialsStorage(Gradle gradle, CredentialsExtension extension, Encryptor encryptor) {
+        this(credentialsFile(gradle, extension), encryptor);
     }
 
     /**
@@ -76,10 +87,10 @@ public class PropertyCredentialsStorage implements CredentialsStorage {
         }
     }
 
-    private static File credentialsFile(Project project, CredentialsExtension extension) {
+    private static File credentialsFile(Gradle gradle, CredentialsExtension extension) {
         String propertyFile = extension.getPropertyFile();
         return (propertyFile != null) ? new File(propertyFile) :
-                new File(project.getGradle().getGradleUserHomeDir(), DEFAULT_FILENAME);
+                new File(gradle.getGradleUserHomeDir(), DEFAULT_FILENAME);
     }
 
     /**

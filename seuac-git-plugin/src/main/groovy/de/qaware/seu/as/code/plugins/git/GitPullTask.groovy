@@ -20,8 +20,8 @@ import org.eclipse.jgit.api.PullCommand
 import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.lib.TextProgressMonitor
 import org.eclipse.jgit.merge.MergeStrategy
-import org.gradle.api.internal.tasks.options.Option
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.options.Option
 
 /**
  * The task implementation to perform a Git pull operation.
