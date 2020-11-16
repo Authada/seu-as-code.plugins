@@ -1,0 +1,150 @@
+/*
+ *    Copyright (C) 2015 QAware GmbH
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+//buildscript {
+//    repositories {
+//        jcenter()
+//        mavenCentral()
+//        maven {
+//            url "https://plugins.gradle.org/m2/"
+//        }
+//    }
+//    dependencies {
+//        classpath 'com.gradle.publish:plugin-publish-plugin:0.10.1'
+//        classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.11.0'
+//        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.4.0'
+//        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.2'
+//    }
+//}
+//
+//apply plugin: 'distribution'
+//
+//allprojects {
+//    apply plugin: 'jacoco'
+//    apply plugin: 'idea'
+//    apply plugin: 'com.github.kt3k.coveralls'
+//
+//    group = 'de.qaware.seu.as.code'
+//
+//    repositories {
+//        jcenter()
+//        mavenCentral()
+//    }
+//
+//    jacoco {
+//        toolVersion = "0.7.6.201602180812"
+//    }
+//}
+//
+//subprojects {
+//    apply plugin: 'base'
+//    apply plugin: 'groovy'
+//    apply plugin: 'java'
+//    apply plugin: 'com.github.hierynomus.license'
+//    apply plugin: 'maven-publish'
+//    apply plugin: 'com.gradle.plugin-publish'
+//    apply plugin: 'com.jfrog.bintray'
+//
+//    license {
+//        includes(["**/*.java", "**/*.groovy"])
+//        mapping {
+//            java = 'SLASHSTAR_STYLE'
+//            groovy = 'SLASHSTAR_STYLE'
+//        }
+//    }
+//
+//    sourceCompatibility = JavaVersion.VERSION_1_8
+//    targetCompatibility = JavaVersion.VERSION_1_8
+//
+//    dependencies {
+//        implementation gradleApi()
+//        implementation localGroovy()
+//
+//        testCompile 'org.spockframework:spock-core:1.3-groovy-2.5'
+//        testCompile 'org.hamcrest:hamcrest-library:1.3'
+//        testRuntime 'cglib:cglib-nodep:3.1'
+//        testRuntime 'org.objenesis:objenesis:2.1'
+//        testCompile 'com.athaydes:spock-reports:1.2.5'
+//
+//        testImplementation gradleTestKit()
+//    }
+//
+//    test {
+//        reports {
+//            junitXml.enabled = false
+//            html.enabled = true
+//        }
+//    }
+//
+//    // This disables the pedantic doclint feature of JDK8
+//    if (JavaVersion.current().isJava8Compatible()) {
+//        tasks.withType(Javadoc) {
+//            options.addStringOption('Xdoclint:none', '-quiet')
+//        }
+//    }
+//
+//    task sourcesJar(type: Jar, dependsOn: classes) {
+//        classifier = 'sources'
+//        from sourceSets.main.allSource
+//    }
+//
+//    jacocoTestReport {
+//        group = 'Coverage'
+//        description = 'Generate Jacoco coverage report for subproject'
+//
+//        additionalSourceDirs = project.files(sourceSets.main.allSource.srcDirs)
+//        sourceDirectories = project.files(sourceSets.main.allSource.srcDirs)
+//        classDirectories = project.files(sourceSets.main.output)
+//
+//        reports {
+//            xml.enabled = true
+//            html.enabled = true
+//        }
+//    }
+//}
+//
+//task jacocoRootReport(type: JacocoReport, group: 'Coverage') {
+//    description = 'Generates aggregate Jacoco coverage report from all subprojects'
+//    dependsOn(subprojects.test)
+//
+//    additionalSourceDirs = files(subprojects.sourceSets.main.allSource.srcDirs)
+//    sourceDirectories = files(subprojects.sourceSets.main.allSource.srcDirs)
+//    classDirectories = files(subprojects.sourceSets.main.output)
+//    executionData = files(subprojects.jacocoTestReport.executionData)
+//
+//    reports {
+//        html.enabled = true
+//        xml.enabled = true
+//    }
+//
+//    doFirst {
+//        executionData = files(executionData.findAll { it.exists() })
+//    }
+//}
+//
+//coveralls {
+//    sourceDirs = subprojects.sourceSets.main.allSource.srcDirs.flatten()
+//    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+//}
+//
+//def isCI = System.env.'CI' == 'true'
+//tasks.coveralls {
+//    group = 'Coverage'
+//    description = 'Upload aggregate Jacoco coverage report to Coveralls'
+//
+//    dependsOn jacocoRootReport
+//    onlyIf { isCI }
+//}
